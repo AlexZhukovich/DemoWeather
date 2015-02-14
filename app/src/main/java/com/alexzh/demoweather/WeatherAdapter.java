@@ -79,7 +79,7 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.ViewHold
                     mList.get(getPosition()).substring(endWeather + 2, endHigh));
             int endLow = mList.get(getPosition()).indexOf(")");
             detailedIntent.putExtra(DetailFragment.LOW_KEY,
-                    mList.get(getPosition()).substring(endHigh + 2, endLow - 1));
+                    mList.get(getPosition()).substring(endHigh + 1, endLow - 1));
 
             mContext.startActivity(detailedIntent);
 
