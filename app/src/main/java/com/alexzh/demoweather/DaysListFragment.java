@@ -1,13 +1,15 @@
 package com.alexzh.demoweather;
 
+import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,23 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import com.alexzh.demoweather.data.WeatherContract.*;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+public class DaysListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-public class DaysListFragment extends Fragment {
+    private final static int WEATHER_LOADER = 0;
 
     private StaggeredGridLayoutManager mGridLayoutManager;
     private RecyclerView mRecyclerView;
@@ -39,6 +29,13 @@ public class DaysListFragment extends Fragment {
     private double mLatitude;
     private double mLongitude;
     private String mUnits;
+
+    private static final String[] DAYS_COLUMNS = {
+            WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
+            WeatherEntry.TABLE_NAME + "." + WeatherEntry.COLUMN_DATE
+    };
+
+    public static int COL_WEATHER_DATE = 1;
 
     public DaysListFragment() {
         setHasOptionsMenu(true);
@@ -52,10 +49,7 @@ public class DaysListFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
-            if (Utility.isInternetConnection(getActivity()))
-                new FetchWeatherTask().execute(String.valueOf(mLatitude), String.valueOf(mLongitude));
-            else
-                Toast.makeText(getActivity(), R.string.connection_problem, Toast.LENGTH_SHORT).show();
+            updateWeather();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -65,11 +59,16 @@ public class DaysListFragment extends Fragment {
         super.onResume();
         if (mUnits == null || !mUnits.equals(Utility.getUnits(getActivity()))) {
             mUnits = Utility.getUnits(getActivity());
-            if (Utility.isInternetConnection(getActivity()))
-                new FetchWeatherTask().execute(String.valueOf(mLatitude), String.valueOf(mLongitude));
-            else
-                Toast.makeText(getActivity(), R.string.connection_problem, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void updateWeather() {
+        if (Utility.isInternetConnection(getActivity()))
+            new FetchWeatherTask(getActivity()).execute(String.valueOf(mLatitude), String.valueOf(mLongitude));
+        else
+            Toast.makeText(getActivity(), R.string.connection_problem, Toast.LENGTH_SHORT).show();
+        getLoaderManager().restartLoader(WEATHER_LOADER, null, this);
+        getLoaderManager().restartLoader(WEATHER_LOADER, null, this);
     }
 
     @Override
@@ -77,14 +76,12 @@ public class DaysListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_days_list, container, false);
 
-        List<String> list = new ArrayList<String>();
-
         mGridLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.list);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mAdapter = new WeatherAdapter(getActivity(), list);
+        mAdapter = new WeatherAdapter(getActivity(), null);
         mRecyclerView.setAdapter(mAdapter);
 
         if (getActivity().getIntent().getExtras() != null) {
@@ -92,158 +89,40 @@ public class DaysListFragment extends Fragment {
             mLongitude = getActivity().getIntent().getDoubleExtra(DaysListActivity.LONGITUDE_KEY, 0.0);
         }
 
-        if (Utility.isInternetConnection(getActivity()))
-            new FetchWeatherTask().execute(String.valueOf(mLatitude), String.valueOf(mLongitude));
-        else
-            Toast.makeText(getActivity(), R.string.connection_problem, Toast.LENGTH_SHORT).show();
+        updateWeather();
         return rootView;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(WEATHER_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
+    }
 
-    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String sortOrder = WeatherEntry.COLUMN_DATE + " ASC";
 
-        private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
+        Uri daysUri = WeatherEntry.buildDaysUri();
 
-        private String getReadableDateString(long time){
-            Date date = new Date(time * 1000);
-            SimpleDateFormat format = new SimpleDateFormat("EEEE, MMM d");
-            return format.format(date).toString();
-        }
+        return new CursorLoader(
+                getActivity(),
+                daysUri,
+                DAYS_COLUMNS,
+                null,
+                null,
+                sortOrder
+        );
+    }
 
-        private String formatTemperature(double high, double low) {
-            long roundedHigh = Math.round(high);
-            long roundedLow = Math.round(low);
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+        mAdapter.notifyDataSetChanged();
+    }
 
-            String highLowStr = roundedHigh + "/" + roundedLow;
-            return highLowStr;
-        }
-
-        private String[] getWeatherDataFromJson(String forecastJsonStr)
-                throws JSONException {
-
-            final String OWM_LIST = "list";
-            final String OWM_WEATHER = "weather";
-            final String OWM_MAX = "temp_max";
-            final String OWM_MIN = "temp_min";
-            final String OWM_DATETIME = "dt";
-            final String OWM_DESCRIPTION = "main";
-
-            JSONObject forecastJson = new JSONObject(forecastJsonStr);
-            JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
-
-            String[] results = new String[weatherArray.length()];
-            for(int i = 0; i < weatherArray.length(); i++) {
-                String day;
-                String description;
-                String highAndLow;
-
-                JSONObject dayForecast = weatherArray.getJSONObject(i);
-
-                long dateTime = dayForecast.getLong(OWM_DATETIME);
-                day = getReadableDateString(dateTime);
-
-                JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
-                description = weatherObject.getString(OWM_DESCRIPTION);
-
-                JSONObject temperatureObject = dayForecast.getJSONObject(OWM_DESCRIPTION);
-                double high = temperatureObject.getDouble(OWM_MAX);
-                double low = temperatureObject.getDouble(OWM_MIN);
-
-                highAndLow = formatTemperature(high, low);
-                results[i] = day + " - " + description + " ( " + highAndLow + " )";
-            }
-
-            for (String s : results) {
-                Log.v(LOG_TAG, "Forecast entry: " + s);
-            }
-            return results;
-
-        }
-        @Override
-        protected String[] doInBackground(String... params) {
-
-            if (params.length == 0) {
-                return null;
-            }
-
-            HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-
-            String forecastJsonStr = null;
-
-            try {
-                final String FORECAST_BASE_URL =
-                        "http://api.openweathermap.org/data/2.5/forecast?";
-                final String UNITS_PARAM = "units";
-                final String LATITUDE_PARAM = "lat";
-                final String LONGITUDE_PARAM = "lon";
-
-
-                Uri builtUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                        .appendQueryParameter(LATITUDE_PARAM, params[0])
-                        .appendQueryParameter(LONGITUDE_PARAM, params[1])
-                        .appendQueryParameter(UNITS_PARAM, mUnits)
-                        .build();
-
-                URL url = new URL(builtUri.toString());
-
-                Log.v(LOG_TAG, "Built URI " + builtUri.toString());
-
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    return null;
-                }
-                forecastJsonStr = buffer.toString();
-
-                Log.v(LOG_TAG, "Forecast string: " + forecastJsonStr);
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
-                return null;
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
-                    }
-                }
-            }
-
-            try {
-                return getWeatherDataFromJson(forecastJsonStr);
-            } catch (JSONException e) {
-                Log.e(LOG_TAG, e.getMessage(), e);
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String[] result) {
-            if (result != null) {
-                mAdapter.clear();
-                for(String dayForecastStr : result) {
-                    mAdapter.add(dayForecastStr);
-                }
-            }
-        }
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 }

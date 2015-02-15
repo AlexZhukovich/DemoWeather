@@ -34,6 +34,11 @@
         <activity
             android:name=".PreferenceActivity"
             android:label="@string/title_activity_preferences" />
+        <provider
+            android:authorities="@string/content_authority"
+            android:name=".data.WeatherProvider"
+            android:exported="false"
+            android:syncable="true" />
     </application>
 
 </manifest>

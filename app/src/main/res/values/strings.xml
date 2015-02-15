@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+
+    <string name="content_authority">com.alexzh.demoweather</string>
 
     <string name="app_name">DemoWeather</string>
     <string name="action_settings">Settings</string>
-    <string name="action_share">Share</string>
     <string name="action_refresh">Refresh</string>
 
     <string name="get_location">Get my location</string>
@@ -21,5 +22,11 @@
     <string name="pref_units_key" translatable="false">units</string>
     <string name="pref_units_metric" translatable="false">metric</string>
     <string name="pref_units_imperial" translatable="false">imperial</string>
+
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="format_full_friendly_date">
+        <xliff:g id="day">%1$s</xliff:g>, <xliff:g id="date">%2$s</xliff:g>
+    </string>
 
 </resources>

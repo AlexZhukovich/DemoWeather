@@ -13,6 +13,11 @@ import java.util.Set;
 public class TestDb extends AndroidTestCase {
 
     public static final String LOG_TAG = TestDb.class.getSimpleName();
+    static final String TEST_LOCATION = "625144";
+    static final String TEST_LATITUDE = "53.901";
+    static final String TEST_LONGITUDE = "27.5667";
+    static final long TEST_DATE = 1423926000;
+    static final long TEST_STR_DATE =20150215;
 
     public void testCreateDatabase() {
         mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
@@ -65,15 +70,16 @@ public class TestDb extends AndroidTestCase {
         dbHelper.close();
     }
 
-    public ContentValues createMinskLocationValue() {
+    public static ContentValues createMinskLocationValue() {
         ContentValues values = new ContentValues();
+        values.put(WeatherContract.LocationEntry.COLUMN_CITY_ID, "625144");
         values.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, "Minsk");
         values.put(WeatherContract.LocationEntry.COLUMN_LATITUDE, "53.901");
         values.put(WeatherContract.LocationEntry.COLUMN_LONGITUDE, "27.5667");
         return values;
     }
 
-    public ContentValues createWeatherValues(long locationId) {
+    public static ContentValues createWeatherValues(long locationId) {
         ContentValues values = new ContentValues();
         values.put(WeatherContract.WeatherEntry.COLUMN_LOCATION_ID, locationId);
         values.put(WeatherContract.WeatherEntry.COLUMN_DATE, 1423926000);
