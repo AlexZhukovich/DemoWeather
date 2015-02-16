@@ -3,8 +3,4 @@
         <item name="colorPrimary">@color/blue_500</item>
         <item name="colorPrimaryDark">@color/blue_600</item>
     </style>
-
-
-
-
 </resources>
