@@ -28,7 +28,8 @@ public class LocationFragment extends Fragment implements GoogleApiClient.Connec
 
     private GoogleApiClient mGoogleApiClient;
 
-    private Button mLocationButton, mSearchButton;
+    private Button mLocationButton;
+    private Button mSearchButton;
     private EditText mLatitudeEditText, mLongitudeEditText;
 
     public LocationFragment() {

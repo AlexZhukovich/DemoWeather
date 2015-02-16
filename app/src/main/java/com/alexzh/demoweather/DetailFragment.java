@@ -15,6 +15,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.alexzh.demoweather.data.WeatherContract;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
@@ -43,9 +44,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry.COLUMN_WIND
     };
 
-    public static final int COL_LATITUDE = 1;
-    public static final int COL_LONGITUDE = 2;
-    public static final int COL_CITY = 3;
     public static final int COL_DATE = 2;
     public static final int COL_MAX_TEMP = 3;
     public static final int COL_MIN_TEMP = 4;
@@ -54,11 +52,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int COL_PRESSURE = 7;
     public static final int COL_WIND = 8;
 
-
-
-    private static final String SHARE_HASHTAG = " #DemoWeather";
-
-    private StaggeredGridLayoutManager mGridLayoutManager;
+private StaggeredGridLayoutManager mGridLayoutManager;
     private RecyclerView mRecyclerView;
     private WeatherTimeAdapter mAdapter;
 
@@ -157,7 +151,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mLongitude = cursor.getString(4);
 
         mWeatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
-                Long.valueOf(mFirstDate),
+                mFirstDate,
                 mLatitude,
                 mLongitude);
 

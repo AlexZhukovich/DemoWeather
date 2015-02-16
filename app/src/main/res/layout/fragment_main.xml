@@ -1,5 +1,4 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
@@ -9,7 +8,8 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginTop="60dp"
-        android:src="@drawable/marker" />
+        android:src="@drawable/marker"
+        android:layout_marginBottom="25dp"/>
 
     <EditText
         android:layout_width="match_parent"
@@ -38,8 +38,9 @@
         android:layout_marginTop="40dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:text="@string/get_location"
-        android:textColor="@color/white" />
+        android:text="@string/action_get_location"
+        android:textColor="@color/white"
+        android:layout_gravity="center_horizontal" />
 
     <Button
         android:id="@+id/search_button"
@@ -48,7 +49,7 @@
         android:layout_marginTop="60dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
-        android:text="@string/search"
+        android:text="@string/action_search"
         android:textColor="@color/white" />
 
 </LinearLayout>

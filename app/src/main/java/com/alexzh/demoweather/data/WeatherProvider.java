@@ -7,10 +7,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.util.Log;
-
+import android.support.annotation.NonNull;
 import com.alexzh.demoweather.Utility;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -82,8 +80,6 @@ public class WeatherProvider extends ContentProvider {
 
         String nextDay = String.valueOf(Utility.getNextDay(
                 Long.valueOf(WeatherContract.WeatherEntry.getDateFromUri(uri).substring(0, 8))));
-        Log.d("DATE", "date: " + date);
-        Log.d("DATE", "nextDay: "+nextDay);
 
         return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
@@ -254,7 +250,7 @@ public class WeatherProvider extends ContentProvider {
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(Uri uri, @NonNull ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {
@@ -272,7 +268,7 @@ public class WeatherProvider extends ContentProvider {
                 } finally {
                     db.endTransaction();
                 }
-                getContext().getContentResolver().notifyChange(uri, null);
+                getContext().getContentResolver().notifyChange(uri, null, true);
                 return returnCount;
             default:
                 return super.bulkInsert(uri, values);

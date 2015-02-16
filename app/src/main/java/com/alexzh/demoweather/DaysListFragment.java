@@ -16,8 +16,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 import com.alexzh.demoweather.data.WeatherContract.*;
+import com.alexzh.demoweather.sync.WeatherSyncAdapter;
 
 public class DaysListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -60,15 +60,14 @@ public class DaysListFragment extends Fragment implements LoaderManager.LoaderCa
         if (mUnits == null || !mUnits.equals(Utility.getUnits(getActivity()))) {
             mUnits = Utility.getUnits(getActivity());
         }
+        getLoaderManager().restartLoader(WEATHER_LOADER, null, this);
     }
 
     private void updateWeather() {
-        if (Utility.isInternetConnection(getActivity()))
-            new FetchWeatherTask(getActivity()).execute(String.valueOf(mLatitude), String.valueOf(mLongitude));
-        else
-            Toast.makeText(getActivity(), R.string.connection_problem, Toast.LENGTH_SHORT).show();
-        getLoaderManager().restartLoader(WEATHER_LOADER, null, this);
-        getLoaderManager().restartLoader(WEATHER_LOADER, null, this);
+        WeatherSyncAdapter.syncImmediately(
+                getActivity(),
+                String.valueOf(mLatitude),
+                String.valueOf(mLongitude));
     }
 
     @Override
@@ -83,6 +82,10 @@ public class DaysListFragment extends Fragment implements LoaderManager.LoaderCa
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mAdapter = new WeatherAdapter(getActivity(), null);
         mRecyclerView.setAdapter(mAdapter);
+
+
+
+
 
         if (getActivity().getIntent().getExtras() != null) {
             mLatitude = getActivity().getIntent().getDoubleExtra(DaysListActivity.LATITUDE_KEY, 0.0);
@@ -101,6 +104,7 @@ public class DaysListFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
         String sortOrder = WeatherEntry.COLUMN_DATE + " ASC";
 
         Uri daysUri = WeatherEntry.buildDaysUri();
@@ -118,7 +122,7 @@ public class DaysListFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
-        mAdapter.notifyDataSetChanged();
+
     }
 
     @Override
