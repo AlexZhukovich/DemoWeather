@@ -20,6 +20,7 @@ public class Utility {
     private final static String CLOUDS_WEATHER = "Clouds";
     private final static String CLEAR_WEATHER = "Clear";
     private final static String RAIN_WEATHER = "Rain";
+    private final static String SNOW_WINDOW = "Snow";
 
     public static String getUnits(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -45,6 +46,8 @@ public class Utility {
                 return "https://ssl.gstatic.com/onebox/weather/256/sunny.png";
             case RAIN_WEATHER:
                 return "https://ssl.gstatic.com/onebox/weather/256/rain.png";
+            case SNOW_WINDOW:
+                return "https://ssl.gstatic.com/onebox/weather/35/snow.png";
 
         }
         return null;

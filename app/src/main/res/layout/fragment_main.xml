@@ -9,7 +9,7 @@
         android:layout_height="60dp"
         android:layout_marginTop="60dp"
         android:src="@drawable/marker"
-        android:layout_marginBottom="25dp"/>
+        android:layout_marginBottom="5dp"/>
 
     <EditText
         android:layout_width="match_parent"
@@ -35,21 +35,23 @@
         android:id="@+id/location_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:text="@string/action_get_location"
         android:textColor="@color/white"
+        android:background="@color/blue_500"
         android:layout_gravity="center_horizontal" />
 
     <Button
         android:id="@+id/search_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="20dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:text="@string/action_search"
+        android:background="@color/blue_500"
         android:textColor="@color/white" />
 
 </LinearLayout>

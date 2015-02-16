@@ -83,8 +83,12 @@ public class LocationFragment extends Fragment implements GoogleApiClient.Connec
 
     private void displayLocation() {
 
-        mLastLocation = LocationServices.FusedLocationApi
-                .getLastLocation(mGoogleApiClient);
+        try {
+            mLastLocation = LocationServices.FusedLocationApi
+                    .getLastLocation(mGoogleApiClient);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         if (mLastLocation != null) {
             mLatitudeEditText.setText(String.valueOf(mLastLocation.getLatitude()));
             mLongitudeEditText.setText(String.valueOf(mLastLocation.getLongitude()));

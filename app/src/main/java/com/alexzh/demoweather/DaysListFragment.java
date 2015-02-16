@@ -37,28 +37,12 @@ public class DaysListFragment extends Fragment implements LoaderManager.LoaderCa
 
     public static int COL_WEATHER_DATE = 1;
 
-    public DaysListFragment() {
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_list_fragment, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh) {
-            updateWeather();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     @Override
     public void onResume() {
         super.onResume();
         if (mUnits == null || !mUnits.equals(Utility.getUnits(getActivity()))) {
             mUnits = Utility.getUnits(getActivity());
+            WeatherSyncAdapter.syncImmediately(getActivity(), String.valueOf(mLatitude), String.valueOf(mLongitude));
         }
         getLoaderManager().restartLoader(WEATHER_LOADER, null, this);
     }
@@ -83,15 +67,10 @@ public class DaysListFragment extends Fragment implements LoaderManager.LoaderCa
         mAdapter = new WeatherAdapter(getActivity(), null);
         mRecyclerView.setAdapter(mAdapter);
 
-
-
-
-
         if (getActivity().getIntent().getExtras() != null) {
             mLatitude = getActivity().getIntent().getDoubleExtra(DaysListActivity.LATITUDE_KEY, 0.0);
             mLongitude = getActivity().getIntent().getDoubleExtra(DaysListActivity.LONGITUDE_KEY, 0.0);
         }
-
         updateWeather();
         return rootView;
     }
