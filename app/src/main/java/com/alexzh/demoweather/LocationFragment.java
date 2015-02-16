@@ -65,11 +65,15 @@ public class LocationFragment extends Fragment implements GoogleApiClient.Connec
             @Override
             public void onClick(View v) {
                 Intent listIntent = new Intent(getActivity(), DaysListActivity.class);
-                listIntent.putExtra(DaysListActivity.LATITUDE_KEY,
-                        Double.valueOf(mLatitudeEditText.getText().toString()));
-                listIntent.putExtra(DaysListActivity.LONGITUDE_KEY,
-                        Double.valueOf(mLongitudeEditText.getText().toString()));
-                getActivity().startActivity(listIntent);
+                try {
+                    double latitude = Double.valueOf(mLatitudeEditText.getText().toString());
+                    double longitude = Double.valueOf(mLongitudeEditText.getText().toString());
+                    listIntent.putExtra(DaysListActivity.LATITUDE_KEY, latitude);
+                    listIntent.putExtra(DaysListActivity.LONGITUDE_KEY, longitude);
+                    getActivity().startActivity(listIntent);
+                }catch (NumberFormatException ex) {
+                    Toast.makeText(getActivity(), R.string.enter_correct_date, Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -84,8 +88,8 @@ public class LocationFragment extends Fragment implements GoogleApiClient.Connec
             mLatitudeEditText.setText(String.valueOf(mLastLocation.getLatitude()));
             mLongitudeEditText.setText(String.valueOf(mLastLocation.getLongitude()));
         } else {
-            mLatitudeEditText.setText("");
-            mLongitudeEditText.setText("");
+            mLatitudeEditText.setText("0.0");
+            mLongitudeEditText.setText("0.0");
         }
     }
 

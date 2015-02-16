@@ -74,20 +74,21 @@ public class WeatherTimeAdapter extends RecyclerView.Adapter<WeatherTimeAdapter.
     public void onBindViewHolder(ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
         String date = mCursor.getString(DetailFragment.COL_DATE);
-        String maxTemp = mCursor.getString(DetailFragment.COL_MAX_TEMP);
-        String minTemp = mCursor.getString(DetailFragment.COL_MIN_TEMP);
-        String humidity = mCursor.getString(DetailFragment.COL_HUMIDITY);
-        String pressure = mCursor.getString(DetailFragment.COL_PRESSURE);
-        String wind = mCursor.getString(DetailFragment.COL_WIND);
+        double maxTemp = mCursor.getDouble(DetailFragment.COL_MAX_TEMP);
+        double minTemp = mCursor.getDouble(DetailFragment.COL_MIN_TEMP);
+        double humidity = mCursor.getDouble(DetailFragment.COL_HUMIDITY);
+        double pressure = mCursor.getDouble(DetailFragment.COL_PRESSURE);
+        double wind = mCursor.getDouble(DetailFragment.COL_WIND);
         String description = mCursor.getString(DetailFragment.COL_DESCRIPTION);
 
         holder.dayTextView.setText(Utility.getFriendlyDayString(mContext, date));
-        holder.dateTextView.setText(Utility.getFormattedMonthDay(mContext, date));
-        holder.maxTempTextView.setText(maxTemp);
-        holder.minTempTextView.setText(minTemp);
-        holder.humidityTextView.setText(humidity);
-        holder.pressureTextView.setText(pressure);
-        holder.windTextView.setText(wind);
+        holder.dateTextView.setText(Utility.getFormattedMonthDay(mContext, date)
+                + " (" + Utility.getTime(date) + ")");
+        holder.maxTempTextView.setText(Utility.formatTemperature(mContext, maxTemp));
+        holder.minTempTextView.setText(Utility.formatTemperature(mContext,minTemp));
+        holder.humidityTextView.setText(Utility.formatHumidity(mContext, humidity));
+        holder.pressureTextView.setText(Utility.formatPressure(mContext, pressure));
+        holder.windTextView.setText(Utility.formatWindSpeed(mContext, wind));
 
         String url = Utility.getWeatherImageUrl(description);
         if (url != null)

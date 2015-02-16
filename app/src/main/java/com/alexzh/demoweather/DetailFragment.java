@@ -1,35 +1,21 @@
 package com.alexzh.demoweather;
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.MergeCursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import com.alexzh.demoweather.data.WeatherContract;
-import java.io.InputStream;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
     private final static int WEATHER_TIME_LOADER = 0;

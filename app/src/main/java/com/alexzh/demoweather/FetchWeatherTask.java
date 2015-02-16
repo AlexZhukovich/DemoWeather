@@ -15,6 +15,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
@@ -103,9 +105,11 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
         JSONObject cityJson = forecastJson.getJSONObject(OWM_CITY);
         String cityName = cityJson.getString(OWM_CITY_NAME);
         JSONObject coordJSON = cityJson.getJSONObject(OWM_COORD);
-        double cityLatitude = coordJSON.getLong(OWM_COORD_LAT);
-        double cityLongitude = coordJSON.getLong(OWM_COORD_LONG);
+        double cityLatitude = coordJSON.getDouble(OWM_COORD_LAT);
+        double cityLongitude = coordJSON.getDouble(OWM_COORD_LONG);
 
+        cityLatitude = new BigDecimal(cityLatitude).setScale(2, RoundingMode.UP).doubleValue();
+        cityLongitude = new BigDecimal(cityLongitude).setScale(2, RoundingMode.UP).doubleValue();
 
         long locationID = addLocation(locationSetting, cityName, cityLatitude, cityLongitude);
 

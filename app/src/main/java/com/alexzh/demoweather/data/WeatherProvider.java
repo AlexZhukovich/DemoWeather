@@ -7,6 +7,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
+
+import com.alexzh.demoweather.Utility;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class WeatherProvider extends ContentProvider {
 
@@ -51,22 +57,38 @@ public class WeatherProvider extends ContentProvider {
                     "." + WeatherContract.LocationEntry.COLUMN_LATITUDE + " = ? AND " +
             WeatherContract.LocationEntry.TABLE_NAME +
                     "." + WeatherContract.LocationEntry.COLUMN_LONGITUDE + " = ? AND " +
-            "substr("+WeatherContract.WeatherEntry.TABLE_NAME +
-                    "." + WeatherContract.WeatherEntry.COLUMN_DATE + ", 1, 8) = ? ";
+            WeatherContract.WeatherEntry.TABLE_NAME +
+                    "." + WeatherContract.WeatherEntry.COLUMN_DATE + " >= ? AND " +
+            "substr(" + WeatherContract.WeatherEntry.TABLE_NAME +
+                    "." + WeatherContract.WeatherEntry.COLUMN_DATE + ", 1, 8) < ? ";
 
 
+    public static final String  sLocationDateSelection =
+            "substr(" + WeatherContract.WeatherEntry.TABLE_NAME +
+                    "." + WeatherContract.WeatherEntry.COLUMN_DATE + ", 1, 8) >= ? " ;
 
 
     private Cursor getWeatherByLocationSettingAndDate(
             Uri uri, String[] projection, String sortOrder) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(Utility.DATE_FORMAT);
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat(Utility.DATE_TIME_FORMAT);
         String lat = WeatherContract.WeatherEntry.getLatitudeFromUri(uri);
         String lon = WeatherContract.WeatherEntry.getLongitudeFromUri(uri);
         String date = WeatherContract.WeatherEntry.getDateFromUri(uri);
+        Date currentDate = new Date();
+        if (dateFormat.format(currentDate).equals(date)) {
+            date = dateTimeFormat.format(currentDate);
+        }
+
+        String nextDay = String.valueOf(Utility.getNextDay(
+                Long.valueOf(WeatherContract.WeatherEntry.getDateFromUri(uri).substring(0, 8))));
+        Log.d("DATE", "date: " + date);
+        Log.d("DATE", "nextDay: "+nextDay);
 
         return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 sLocationSettingAndDaySelection,
-                new String[]{lat, lon, date},
+                new String[]{lat, lon, date, nextDay},
                 null,
                 null,
                 sortOrder
@@ -85,12 +107,15 @@ public class WeatherProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case DAYS:
             {
+                Date todayDate = new Date();
+                String todayStr = WeatherContract.getDbDateString(todayDate).substring(0, 8);
+
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         true,
                         WeatherContract.WeatherEntry.TABLE_NAME,
                         projection,
-                        selection,
-                        selectionArgs,
+                        sLocationDateSelection,
+                        new String[] {todayStr},
                         "strftime('%Y-%m-%d', "+"substr("+WeatherContract.WeatherEntry.COLUMN_DATE+", 1, 8))",
                         null,
                         sortOrder,

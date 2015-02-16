@@ -1,12 +1,10 @@
 package com.alexzh.demoweather;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.alexzh.demoweather.data.WeatherContract;
 
@@ -52,12 +50,30 @@ public class Utility {
         return null;
     }
 
+    static String formatTemperature(Context context, double temperature) {
+        return context.getString(R.string.format_temperature, temperature);
+    }
+
+    static String formatHumidity(Context context, double humidity) {
+        return context.getString(R.string.format_humidity, humidity);
+    }
+
+    static String formatPressure(Context context, double pressure) {
+        return context.getString(R.string.format_pressure, pressure);
+    }
+
+    static String formatWindSpeed(Context context, double windSpeed) {
+        return context.getString(R.string.format_wind_kmh, windSpeed);
+    }
+
     static String formatDate(String dateString) {
         Date date = WeatherContract.getDateFromDb(dateString);
         return DateFormat.getDateInstance().format(date);
     }
 
+    public static final String DATE_TIME_FORMAT = "yyyyMMdd HH:mm";
     public static final String DATE_FORMAT = "yyyyMMdd";
+    public static final String TIME_FORMAT = "HH:mm";
 
     /**
      * Helper method to convert the database representation of the date into something to display
@@ -72,6 +88,7 @@ public class Utility {
         dateStr = dateStr.substring(0, 8);
         Date todayDate = new Date();
         String todayStr = WeatherContract.getDbDateString(todayDate);
+        todayStr = todayStr.substring(0, 8);
         Date inputDate = WeatherContract.getDateFromDb(dateStr);
 
         if (todayStr.equals(dateStr)) {
@@ -119,7 +136,7 @@ public class Utility {
                 cal.setTime(todayDate);
                 cal.add(Calendar.DATE, 1);
                 Date tomorrowDate = cal.getTime();
-                if (WeatherContract.getDbDateString(tomorrowDate).equals(
+                if (WeatherContract.getDbDateString(tomorrowDate).substring(0, 8).equals(
                         dateStr)) {
                     return context.getString(R.string.tomorrow);
                 } else {
@@ -148,6 +165,18 @@ public class Utility {
             SimpleDateFormat monthDayFormat = new SimpleDateFormat("MMMM dd");
             String monthDayString = monthDayFormat.format(inputDate);
             return monthDayString;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String getTime(String dateStr) {
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat(Utility.DATE_TIME_FORMAT);
+        try {
+            Date inputDate = dateTimeFormat.parse(dateStr);
+            SimpleDateFormat timeFormat = new SimpleDateFormat(Utility.TIME_FORMAT);
+            return timeFormat.format(inputDate);
         } catch (ParseException e) {
             e.printStackTrace();
             return null;
