@@ -11,9 +11,6 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import com.alexzh.demoweather.data.WeatherContract.*;
@@ -28,7 +25,6 @@ public class DaysListFragment extends Fragment implements LoaderManager.LoaderCa
     private WeatherAdapter mAdapter;
     private double mLatitude;
     private double mLongitude;
-    private String mUnits;
 
     private static final String[] DAYS_COLUMNS = {
             WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
@@ -36,16 +32,6 @@ public class DaysListFragment extends Fragment implements LoaderManager.LoaderCa
     };
 
     public static int COL_WEATHER_DATE = 1;
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mUnits == null || !mUnits.equals(Utility.getUnits(getActivity()))) {
-            mUnits = Utility.getUnits(getActivity());
-            WeatherSyncAdapter.syncImmediately(getActivity(), String.valueOf(mLatitude), String.valueOf(mLongitude));
-        }
-        getLoaderManager().restartLoader(WEATHER_LOADER, null, this);
-    }
 
     private void updateWeather() {
         WeatherSyncAdapter.syncImmediately(

@@ -8,15 +8,12 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import com.alexzh.demoweather.R;
-import com.alexzh.demoweather.Utility;
 import com.alexzh.demoweather.data.WeatherContract;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,7 +54,7 @@ public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
 
         String forecastJsonStr = null;
 
-        String mUnits = Utility.getUnits(getContext());
+        String mUnits = "metric";
 
         try {
             final String FORECAST_BASE_URL =
@@ -310,23 +307,5 @@ public class WeatherSyncAdapter extends AbstractThreadedSyncAdapter {
 
         }
         return newAccount;
-    }
-
-    /**
-     * Helper method to schedule the sync adapter periodic execution
-     */
-    public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
-        Account account = getSyncAccount(context);
-        String authority = context.getString(R.string.content_authority);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            SyncRequest request = new SyncRequest.Builder().
-                    syncPeriodic(syncInterval, flexTime).
-                    setSyncAdapter(account, authority).
-                    setExtras(new Bundle()).build();
-            ContentResolver.requestSync(request);
-        } else {
-            ContentResolver.addPeriodicSync(account,
-                    authority, new Bundle(), syncInterval);
-        }
     }
 }

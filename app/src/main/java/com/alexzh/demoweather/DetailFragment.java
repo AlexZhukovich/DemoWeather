@@ -31,6 +31,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private String mLongitude;
     private long mFirstDate;
     private Uri mWeatherUri;
+    private boolean isMetric;
 
     private static final String[] DAYS_COLUMNS = {
             WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
@@ -58,6 +59,15 @@ private StaggeredGridLayoutManager mGridLayoutManager;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (isMetric != Utility.isMetric(getActivity())) {
+            isMetric = Utility.isMetric(getActivity());
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override

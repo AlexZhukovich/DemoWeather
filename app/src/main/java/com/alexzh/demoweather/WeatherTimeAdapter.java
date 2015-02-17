@@ -82,10 +82,12 @@ public class WeatherTimeAdapter extends RecyclerView.Adapter<WeatherTimeAdapter.
         String description = mCursor.getString(DetailFragment.COL_DESCRIPTION);
 
         holder.dayTextView.setText(Utility.getFriendlyDayString(mContext, date));
-        holder.dateTextView.setText(Utility.getFormattedMonthDay(mContext, date)
+        holder.dateTextView.setText(Utility.getFormattedMonthDay(date)
                 + " (" + Utility.getTime(date) + ")");
-        holder.maxTempTextView.setText(Utility.formatTemperature(mContext, maxTemp));
-        holder.minTempTextView.setText(Utility.formatTemperature(mContext,minTemp));
+        holder.maxTempTextView.setText(Utility.formatTemperature(mContext, maxTemp,
+                Utility.isMetric(mContext)));
+        holder.minTempTextView.setText(Utility.formatTemperature(mContext,minTemp,
+                Utility.isMetric(mContext)));
         holder.humidityTextView.setText(Utility.formatHumidity(mContext, humidity));
         holder.pressureTextView.setText(Utility.formatPressure(mContext, pressure));
         holder.windTextView.setText(Utility.formatWindSpeed(mContext, wind));
@@ -118,14 +120,6 @@ public class WeatherTimeAdapter extends RecyclerView.Adapter<WeatherTimeAdapter.
             descriptionImageView = (ImageView) itemView.findViewById(R.id.detail_imageview);
 
             itemView.setTag(itemView);
-        }
-
-    }
-
-    public void changeCursor(Cursor cursor) {
-        Cursor old = swapCursor(cursor);
-        if (old != null) {
-            old.close();
         }
     }
 

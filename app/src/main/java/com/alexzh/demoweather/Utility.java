@@ -2,8 +2,6 @@ package com.alexzh.demoweather;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 
 import com.alexzh.demoweather.data.WeatherContract;
@@ -22,20 +20,21 @@ public class Utility {
     private final static String RAIN_WEATHER = "Rain";
     private final static String SNOW_WINDOW = "Snow";
 
-    public static String getUnits(Context context) {
+    public static boolean isMetric(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getString(context.getString(R.string.pref_units_key),
-                context.getString(R.string.pref_units_metric));
+                context.getString(R.string.pref_units_metric))
+                .equals(context.getString(R.string.pref_units_metric));
     }
 
-    public static boolean isInternetConnection(Context context) {
-        ConnectivityManager cm =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        if (netInfo != null && netInfo.isConnectedOrConnecting()) {
-            return true;
+    static String formatTemperature(Context context, double temperature, boolean isMetric) {
+        double temp;
+        if ( !isMetric ) {
+            temp = 9 * temperature/5+32;
+        } else {
+            temp = temperature;
         }
-        return false;
+        return context.getString(R.string.format_temperature, temp);
     }
 
     public static String getWeatherImageUrl(String weather) {
@@ -47,14 +46,10 @@ public class Utility {
             case RAIN_WEATHER:
                 return "https://ssl.gstatic.com/onebox/weather/256/rain.png";
             case SNOW_WINDOW:
-                return "https://ssl.gstatic.com/onebox/weather/35/snow.png";
+                return "https://cdn4.iconfinder.com/data/icons/iconsland-weather/PNG/256x256/Sleet.png";
 
         }
         return null;
-    }
-
-    static String formatTemperature(Context context, double temperature) {
-        return context.getString(R.string.format_temperature, temperature);
     }
 
     static String formatHumidity(Context context, double humidity) {
@@ -100,7 +95,7 @@ public class Utility {
             return String.format(context.getString(
                     formatId,
                     today,
-                    getFormattedMonthDay(context, dateStr)));
+                    getFormattedMonthDay(dateStr)));
         } else {
             Calendar cal = Calendar.getInstance();
             cal.setTime(todayDate);
@@ -155,12 +150,11 @@ public class Utility {
 
     /**
      * Converts db date format to the format "Month day", e.g "June 24".
-     * @param context Context to use for resource localization
      * @param dateStr The db formatted date string, expected to be of the form specified
      *                in Utility.DATE_FORMAT
      * @return The day in the form of a string formatted "December 6"
      */
-    public static String getFormattedMonthDay(Context context, String dateStr) {
+    public static String getFormattedMonthDay(String dateStr) {
         dateStr = dateStr.substring(0, 8);
         SimpleDateFormat dbDateFormat = new SimpleDateFormat(Utility.DATE_FORMAT);
         try {
