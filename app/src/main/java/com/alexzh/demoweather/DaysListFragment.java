@@ -17,11 +17,11 @@ import com.alexzh.demoweather.data.WeatherContract.*;
 import com.alexzh.demoweather.sync.WeatherSyncAdapter;
 
 public class DaysListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-
     private final static int WEATHER_LOADER = 0;
+    private final static int NUM_GRID_COLUMN = 1;
 
     private StaggeredGridLayoutManager mGridLayoutManager;
-    private RecyclerView mRecyclerView;
+    private RecyclerView mRecView;
     private WeatherAdapter mAdapter;
     private double mLatitude;
     private double mLongitude;
@@ -32,6 +32,7 @@ public class DaysListFragment extends Fragment implements LoaderManager.LoaderCa
     };
 
     public static int COL_WEATHER_DATE = 1;
+
 
     private void updateWeather() {
         WeatherSyncAdapter.syncImmediately(
@@ -45,13 +46,14 @@ public class DaysListFragment extends Fragment implements LoaderManager.LoaderCa
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_days_list, container, false);
 
-        mGridLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.list);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(mGridLayoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mGridLayoutManager = new StaggeredGridLayoutManager(NUM_GRID_COLUMN,
+                StaggeredGridLayoutManager.VERTICAL);
+        mRecView = (RecyclerView) rootView.findViewById(R.id.list);
+        mRecView.setHasFixedSize(true);
+        mRecView.setLayoutManager(mGridLayoutManager);
+        mRecView.setItemAnimator(new DefaultItemAnimator());
         mAdapter = new WeatherAdapter(getActivity(), null);
-        mRecyclerView.setAdapter(mAdapter);
+        mRecView.setAdapter(mAdapter);
 
         if (getActivity().getIntent().getExtras() != null) {
             mLatitude = getActivity().getIntent().getDoubleExtra(DaysListActivity.LATITUDE_KEY, 0.0);

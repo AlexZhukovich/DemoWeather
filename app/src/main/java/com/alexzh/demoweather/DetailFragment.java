@@ -20,6 +20,7 @@ import com.alexzh.demoweather.data.WeatherContract;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
     private final static int WEATHER_TIME_LOADER = 0;
+    private final static int NUM_GRID_COLUMN = 1;
 
     public static final String CURRENT_DATE = "current_date";
 
@@ -54,7 +55,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int COL_WIND = 8;
 
 private StaggeredGridLayoutManager mGridLayoutManager;
-    private RecyclerView mRecyclerView;
+    private RecyclerView mRecView;
     private WeatherTimeAdapter mAdapter;
 
     public DetailFragment() {
@@ -75,13 +76,14 @@ private StaggeredGridLayoutManager mGridLayoutManager;
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        mGridLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
-        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.list);
-        mRecyclerView.setHasFixedSize(true);
-        mRecyclerView.setLayoutManager(mGridLayoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mGridLayoutManager = new StaggeredGridLayoutManager(NUM_GRID_COLUMN,
+                StaggeredGridLayoutManager.VERTICAL);
+        mRecView = (RecyclerView) rootView.findViewById(R.id.list);
+        mRecView.setHasFixedSize(true);
+        mRecView.setLayoutManager(mGridLayoutManager);
+        mRecView.setItemAnimator(new DefaultItemAnimator());
         mAdapter = new WeatherTimeAdapter(getActivity(), null);
-        mRecyclerView.setAdapter(mAdapter);
+        mRecView.setAdapter(mAdapter);
 
         if (getActivity().getIntent().getExtras() != null) {
             mFirstDate = Long.valueOf(getActivity().getIntent().getStringExtra(CURRENT_DATE).substring(0,8));
@@ -89,9 +91,9 @@ private StaggeredGridLayoutManager mGridLayoutManager;
 
         final LinearLayoutManager mLayoutManager;
         mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecView.setLayoutManager(mLayoutManager);
 
-        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        mRecView.setOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);

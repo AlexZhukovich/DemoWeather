@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.alexzh.demoweather.data.WeatherContract;
-
 import java.io.InputStream;
 
 public class WeatherTimeAdapter extends RecyclerView.Adapter<WeatherTimeAdapter.ViewHolder> {

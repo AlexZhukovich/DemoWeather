@@ -11,9 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class LocationFragment extends Fragment {
-    private Button mLocationButton;
-    private Button mSearchButton;
+public class LocationFragment extends Fragment implements View.OnClickListener {
     private EditText mLatitudeEditText, mLongitudeEditText;
 
     public LocationFragment() {
@@ -29,28 +27,18 @@ public class LocationFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        mLocationButton = (Button) rootView.findViewById(R.id.location_button);
-        mSearchButton = (Button) rootView.findViewById(R.id.search_button);
+        ((Button) rootView.findViewById(R.id.location_button)).setOnClickListener(this);
+        ((Button) rootView.findViewById(R.id.search_button)).setOnClickListener(this);
         mLatitudeEditText = (EditText) rootView.findViewById(R.id.latitude_edittext);
         mLongitudeEditText = (EditText) rootView.findViewById(R.id.longitude_edittext);
 
-        mLocationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LocationService locationService = new LocationService(getActivity());
-                if (locationService.isGPSEnabled() || locationService.isNetworkEnabled()) {
-                    mLatitudeEditText.setText(String.valueOf(locationService.getLatitude()));
-                    mLongitudeEditText.setText(String.valueOf(locationService.getLongitude()));
-                } else {
-                    locationService.showSettingsAlert();
-                }
+        return rootView;
+    }
 
-            }
-        });
-
-        mSearchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.search_button:
                 Intent listIntent = new Intent(getActivity(), DaysListActivity.class);
                 try {
                     double latitude = Double.valueOf(mLatitudeEditText.getText().toString());
@@ -61,8 +49,16 @@ public class LocationFragment extends Fragment {
                 }catch (NumberFormatException ex) {
                     Toast.makeText(getActivity(), R.string.enter_correct_date, Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
-        return rootView;
+                break;
+            case R.id.location_button:
+                LocationService locationService = new LocationService(getActivity());
+                if (locationService.isGPSEnabled() || locationService.isNetworkEnabled()) {
+                    mLatitudeEditText.setText(String.valueOf(locationService.getLatitude()));
+                    mLongitudeEditText.setText(String.valueOf(locationService.getLongitude()));
+                } else {
+                    locationService.showSettingsAlert();
+                }
+                break;
+        }
     }
 }
